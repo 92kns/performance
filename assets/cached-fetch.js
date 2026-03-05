@@ -70,4 +70,8 @@
       });
     });
   };
+  window.clearFetchCache = function() {
+    indexedDB.deleteDatabase(DB_NAME);
+    location.reload();
+  };
 })();

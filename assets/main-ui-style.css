@@ -57,9 +57,6 @@ body {
     align-items: center;
     justify-content: center;
     flex-grow: 1;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-15%); /* adjust for sidebar */
 }
 
 .top-title {

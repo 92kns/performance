@@ -136,6 +136,21 @@ if (sidebar !== null) {
   `;
 }
 
+// Add refresh button to top bar if cachedFetch is available
+if (typeof clearFetchCache === 'function') {
+  var topBar = document.querySelector('.top');
+  var reportBtn = topBar && topBar.querySelector('a[title="Report a Performance Bug"]');
+  if (reportBtn) {
+    var refreshBtn = document.createElement('a');
+    refreshBtn.href = 'javascript:void(0)';
+    refreshBtn.className = 'btn';
+    refreshBtn.title = 'Refresh data';
+    refreshBtn.onclick = clearFetchCache;
+    refreshBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh Data';
+    topBar.insertBefore(refreshBtn, reportBtn);
+  }
+}
+
 // jQuery for sidebar interactions
 $(document).ready(function() {
   // Handle submenu toggle
