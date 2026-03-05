@@ -630,7 +630,7 @@ async function loadDataFromTreeherder() {
     for (const platform of platforms) {
       // Fetch Firefox signatures from selected repository
       const firefoxSigUrl = `https://treeherder.mozilla.org/api/project/${repository}/performance/signatures/?framework=15&platform=${platform}`;
-      const firefoxSigResponse = await fetch(firefoxSigUrl);
+      const firefoxSigResponse = await cachedFetch(firefoxSigUrl);
       const firefoxSignatures = await firefoxSigResponse.json();
 
       // Filter to only relevant Firefox signatures (exclude variant runs like profiling)
@@ -644,7 +644,7 @@ async function loadDataFromTreeherder() {
 
       // Always fetch Chrome signatures from mozilla-central
       const chromeSigUrl = `https://treeherder.mozilla.org/api/project/mozilla-central/performance/signatures/?framework=15&platform=${platform}`;
-      const chromeSigResponse = await fetch(chromeSigUrl);
+      const chromeSigResponse = await cachedFetch(chromeSigUrl);
       const chromeSignatures = await chromeSigResponse.json();
 
       // Filter to only relevant Chrome signatures (exclude variant runs like profiling)
@@ -668,7 +668,7 @@ async function loadDataFromTreeherder() {
       const replicatesParam = window.showReplicates ? '&replicates=true' : '';
       const dataUrl = `https://treeherder.mozilla.org/api/performance/summary/?repository=${sigRepository}&signature=${sig.id}&framework=15&interval=${intervalSeconds}&all_data=true${replicatesParam}`;
 
-      const fetchPromise = fetch(dataUrl)
+      const fetchPromise = cachedFetch(dataUrl)
         .then(response => response.json())
         .then(perfData => {
           const dataPoints = [];
@@ -854,7 +854,7 @@ async function fetchAlertsForTest(testMetric, platform, suiteName) {
 
     // Get autoland signature ID for this test/platform (framework 15 for Android)
     const sigUrl = `https://treeherder.mozilla.org/api/project/autoland/performance/signatures/?framework=15&platform=${platform}`;
-    const sigResponse = await fetch(sigUrl);
+    const sigResponse = await cachedFetch(sigUrl);
     const signatures = await sigResponse.json();
 
     // Find signature by suite name and test name (applink_startup, homeview_startup, etc.)
@@ -882,7 +882,7 @@ async function fetchAlertsForTest(testMetric, platform, suiteName) {
     const timerangeSeconds = window.selectedTimeline * 24 * 60 * 60;
     const summaryUrl = `https://treeherder.mozilla.org/api/performance/alertsummary/?alerts__series_signature=${autolandSigId}&repository=77&limit=100&timerange=${timerangeSeconds}`;
 
-    const summaryResponse = await fetch(summaryUrl);
+    const summaryResponse = await cachedFetch(summaryUrl);
     const summaryData = await summaryResponse.json();
 
     const allAlerts = [];
@@ -917,7 +917,7 @@ async function fetchAlertsForTest(testMetric, platform, suiteName) {
       if (!window.alertSummaries[relatedId]) {
         try {
           const relatedUrl = `https://treeherder.mozilla.org/api/performance/alertsummary/${relatedId}/`;
-          const relatedResponse = await fetch(relatedUrl);
+          const relatedResponse = await cachedFetch(relatedUrl);
           const relatedData = await relatedResponse.json();
           window.alertSummaries[relatedId] = relatedData;
 

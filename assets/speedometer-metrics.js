@@ -106,7 +106,7 @@ async function loadSpeedometerData(loadInitialChart = true) {
       // Fetch Firefox signatures from selected repository
       console.log(`Fetching Firefox signatures for platform: ${platform} from ${window.speedometerData.repository}`);
       const firefoxSigUrl = `https://treeherder.mozilla.org/api/project/${window.speedometerData.repository}/performance/signatures/?framework=${window.speedometerData.framework}&platform=${platform}`;
-      const firefoxSigResponse = await fetch(firefoxSigUrl);
+      const firefoxSigResponse = await cachedFetch(firefoxSigUrl);
       const firefoxSignatures = await firefoxSigResponse.json();
 
       let firefoxSigCount = 0;
@@ -122,7 +122,7 @@ async function loadSpeedometerData(loadInitialChart = true) {
       // Always fetch Chrome/Safari signatures from mozilla-central
       console.log(`Fetching Chrome/Safari signatures for platform: ${platform} from mozilla-central`);
       const chromeSigUrl = `https://treeherder.mozilla.org/api/project/mozilla-central/performance/signatures/?framework=${window.speedometerData.framework}&platform=${platform}`;
-      const chromeSigResponse = await fetch(chromeSigUrl);
+      const chromeSigResponse = await cachedFetch(chromeSigUrl);
       const chromeSignatures = await chromeSigResponse.json();
 
       let chromeSigCount = 0;
@@ -196,7 +196,7 @@ async function loadDataForPeriod(days, signatures) {
       const repository = sig.repository || window.speedometerData.repository;
       const replicatesParam = window.speedometerData.showReplicates ? '&replicates=true' : '';
       const dataUrl = `https://treeherder.mozilla.org/api/performance/summary/?repository=${repository}&signature=${sig.id}&framework=${window.speedometerData.framework}&interval=${intervalSeconds}&all_data=true${replicatesParam}`;
-      const dataResponse = await fetch(dataUrl);
+      const dataResponse = await cachedFetch(dataUrl);
       const perfData = await dataResponse.json();
 
       const dataPoints = [];
@@ -271,7 +271,7 @@ async function loadChartDataForTest(testName, days) {
       const repository = sig.repository || window.speedometerData.repository;
       const replicatesParam = window.speedometerData.showReplicates ? '&replicates=true' : '';
       const dataUrl = `https://treeherder.mozilla.org/api/performance/summary/?repository=${repository}&signature=${sig.id}&framework=${window.speedometerData.framework}&interval=${intervalSeconds}&all_data=true${replicatesParam}`;
-      const dataResponse = await fetch(dataUrl);
+      const dataResponse = await cachedFetch(dataUrl);
       const perfData = await dataResponse.json();
 
       const dataPoints = [];
@@ -321,7 +321,7 @@ async function fetchAlertsForTest(testName, platform, days) {
 
     // First, get the autoland signature IDs for this test and its parts
     const sigUrl = `https://treeherder.mozilla.org/api/project/autoland/performance/signatures/?framework=13&platform=${platform}`;
-    const sigResponse = await fetch(sigUrl);
+    const sigResponse = await cachedFetch(sigUrl);
     const signatures = await sigResponse.json();
 
     // Find all signatures for this test and its subparts
@@ -355,7 +355,7 @@ async function fetchAlertsForTest(testName, platform, days) {
 
     const alertPromises = autolandSigIds.map(async (sigId) => {
       const summaryUrl = `https://treeherder.mozilla.org/api/performance/alertsummary/?alerts__series_signature=${sigId}&repository=77&limit=100&timerange=${timerangeSeconds}`;
-      const summaryResponse = await fetch(summaryUrl);
+      const summaryResponse = await cachedFetch(summaryUrl);
       const summaryData = await summaryResponse.json();
 
       const sigAlerts = [];
@@ -395,7 +395,7 @@ async function fetchAlertsForTest(testName, platform, days) {
       if (!window.speedometerData.alertSummaries[relatedId]) {
         try {
           const relatedUrl = `https://treeherder.mozilla.org/api/performance/alertsummary/${relatedId}/`;
-          const relatedResponse = await fetch(relatedUrl);
+          const relatedResponse = await cachedFetch(relatedUrl);
           const relatedData = await relatedResponse.json();
           window.speedometerData.alertSummaries[relatedId] = relatedData;
 
@@ -1477,7 +1477,7 @@ async function fetchBugData() {
   params.append('include_fields', 'id,status,creation_time,cf_last_resolved,component');
 
   const url = `https://bugzilla.mozilla.org/rest/bug?${params}`;
-  const response = await fetch(url);
+  const response = await cachedFetch(url);
   return response.json();
 }
 

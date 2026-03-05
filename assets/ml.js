@@ -314,7 +314,7 @@ function createSmartTabSuggest(platform) {
 async function createCharts(dataUrl, platform) {
   if (!data) {
     try {
-      const response = await fetch(dataUrl);
+      const response = await cachedFetch(dataUrl);
       data = await response.json();
       data = data.query_result.data.rows;
       fixupMLNaming();
@@ -545,7 +545,7 @@ async function loadEngineData() {
 
   if (!engineData) {
     try {
-      const response = await fetch(dataUrl);
+      const response = await cachedFetch(dataUrl);
       engineData = await response.json();
       engineData = engineData.query_result.data.rows;
       renderEngineData(engineData);

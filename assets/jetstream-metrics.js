@@ -89,7 +89,7 @@ async function loadChartFromTreeherder(testName) {
 
     // Fetch Firefox signatures from selected repository
     const firefoxSigUrl = `https://treeherder.mozilla.org/api/project/${repository}/performance/signatures/?framework=13&platform=${platform}`;
-    const firefoxSigResponse = await fetch(firefoxSigUrl);
+    const firefoxSigResponse = await cachedFetch(firefoxSigUrl);
     const firefoxSignatures = await firefoxSigResponse.json();
 
     for (const [sigId, sig] of Object.entries(firefoxSignatures)) {
@@ -101,7 +101,7 @@ async function loadChartFromTreeherder(testName) {
 
     // Always fetch Chrome/Safari signatures from mozilla-central
     const chromeSigUrl = `https://treeherder.mozilla.org/api/project/mozilla-central/performance/signatures/?framework=13&platform=${platform}`;
-    const chromeSigResponse = await fetch(chromeSigUrl);
+    const chromeSigResponse = await cachedFetch(chromeSigUrl);
     const chromeSignatures = await chromeSigResponse.json();
 
     for (const [sigId, sig] of Object.entries(chromeSignatures)) {
@@ -126,7 +126,7 @@ async function loadChartFromTreeherder(testName) {
     for (const sig of testSignatures) {
       const sigRepository = sig.repository || repository;
       const dataUrl = `https://treeherder.mozilla.org/api/performance/summary/?repository=${sigRepository}&signature=${sig.id}&framework=13&interval=${intervalSeconds}&all_data=true`;
-      const dataResponse = await fetch(dataUrl);
+      const dataResponse = await cachedFetch(dataUrl);
       const perfData = await dataResponse.json();
 
       if (Array.isArray(perfData) && perfData.length > 0 && perfData[0].data) {
@@ -166,7 +166,7 @@ async function fetchAlertsForTest(testName, platform) {
 
     // Get autoland signature for this test
     const sigUrl = `https://treeherder.mozilla.org/api/project/autoland/performance/signatures/?framework=13&platform=${platform}`;
-    const sigResponse = await fetch(sigUrl);
+    const sigResponse = await cachedFetch(sigUrl);
     const signatures = await sigResponse.json();
 
     let autolandSigId = null;
@@ -191,7 +191,7 @@ async function fetchAlertsForTest(testName, platform) {
     const timerangeSeconds = 90 * 24 * 60 * 60;
     const summaryUrl = `https://treeherder.mozilla.org/api/performance/alertsummary/?alerts__series_signature=${autolandSigId}&repository=77&limit=100&timerange=${timerangeSeconds}`;
 
-    const summaryResponse = await fetch(summaryUrl);
+    const summaryResponse = await cachedFetch(summaryUrl);
     const summaryData = await summaryResponse.json();
 
     const allAlerts = [];
